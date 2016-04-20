@@ -1,0 +1,263 @@
+<html>
+<head>
+	<title>Jogo do Galo</title>
+</head>
+
+<style>
+	body{
+		background-color: black;
+	}
+</style>
+<script type="text/javascript" src="js/jquery-2.1.3.js"></script>
+
+<script type="text/javascript">
+	var matriz = [[0,0,0],[0,0,0],[0,0,0]];
+	var playerIdx=1;
+	var playerImage = "red";
+
+	var terminado = false;
+
+	function verificarVencedor(mRecebida){
+
+		//Horizontais
+		if((mRecebida[0][0] != 0) && (mRecebida[0][0] == mRecebida[0][1]) && (mRecebida[0][1] == mRecebida[0][2])){
+			return true;
+		}
+		if((mRecebida[1][0] != 0) && (mRecebida[1][0] == mRecebida[1][1]) && (mRecebida[1][1] == mRecebida[1][2])){
+			return true;
+		}
+		if((mRecebida[2][0] != 0) && (mRecebida[2][0] == mRecebida[2][1]) && (mRecebida[2][1] == mRecebida[2][2])){
+			return true;
+		}
+
+		//Verticais
+		if((mRecebida[0][0] != 0) && (mRecebida[0][0] == mRecebida[1][0]) && (mRecebida[1][0] == mRecebida[2][0])){
+			return true;
+		}
+		if((mRecebida[0][1] != 0) && (mRecebida[0][1] == mRecebida[1][1]) && (mRecebida[1][1] == mRecebida[2][1])){
+			return true;
+		}
+		if((mRecebida[0][2] != 0) && (mRecebida[0][2] == mRecebida[1][2]) && (mRecebida[1][2] == mRecebida[2][2])){
+			return true;
+		}
+
+		//Diagonais
+		if((mRecebida[0][0] != 0) && (mRecebida[0][0] == mRecebida[1][1]) && (mRecebida[1][1] == mRecebida[2][2])){
+			return true;
+		}
+		if((mRecebida[2][0] != 0) && (mRecebida[2][0] == mRecebida[1][1]) && (mRecebida[1][1] == mRecebida[0][2])){
+			return true;
+		}
+		
+	}
+
+	function alertDismissed() {
+	    // do something
+
+	}
+
+	function preparePolifills(){
+		if(!navigator){
+			navigator = new Object();
+		}
+
+		if(!navigator.notification){
+			navigator.notification = new Object();
+		}
+
+		if(!navigator.notification.alert){
+			navigator.notification.alert = function(message, callback, title, buttonName){
+				alert(message);
+				if(callback){
+					callback();
+				}
+			};
+		}
+	}
+
+	function showAlert(title, message, dismissAction, dismissText){
+		navigator.notification.alert(
+		    message,  // message
+		    dismissAction,         // callback
+		    title,            // title
+		    dismissText                  // buttonName
+		);	
+		/*if (navigator && navigator.notification && navigator.notification.alert){
+			navigator.notification.alert(
+			    message,  // message
+			    dismissAction,         // callback
+			    title,            // title
+			    dismissText                  // buttonName
+			);	
+		}else{
+			alert(message);
+			if(dismissAction){
+				dismissAction();
+			}
+		}*/
+	}
+
+	function joga(linha, coluna, elementoClicado){
+		if (matrizCheia()){
+			alert("Empate!")
+			return;
+		}
+		if(matriz[linha][coluna] != 0){
+			return;
+		}
+
+		$(elementoClicado).find("img").attr("src", "img/player"+playerIdx+".png");		
+
+		matriz[linha][coluna] = playerIdx;
+
+		if(verificarVencedor(matriz) == true){
+			showAlert("Game Over", 'You are the winner!', alertDismissed, "OK");
+			//alert("Vencedor: Jogador " + playerIdx);
+			terminado = true;
+			return;
+		}
+		if (matrizCheia()){
+			alert("Empate!")
+			return;
+		}
+
+		if(playerIdx == 1){
+			playerIdx = 2;
+		}
+		else{
+			playerIdx = 1;
+		}
+
+		if (playerIdx == 2){
+			jogaCPU();
+		}
+	}
+
+	function matrizCheia(){
+		for(var i=0; i!=3; i++){
+			for(var j=0; j!=3; j++){
+				if (matriz[i][j] == 0){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	function copiarMatriz(matrizAntiga){
+		var matrizNova = [[0,0,0],[0,0,0],[0,0,0]];
+		for(var i=0; i!=3; i++){
+			for(var j=0; j!=3; j++){
+				matrizNova[i][j] = matrizAntiga[i][j];
+			}
+		}
+		return matrizNova;
+	}
+
+	function jogaCPU(){
+		var linha;// = Math.floor((Math.random() * 3) + 0);
+		var coluna;// = Math.floor((Math.random() * 3) + 0);
+
+		//Atacar
+		for(var i=0; i!=3; i++){
+			for(var j=0; j!=3; j++){
+				linha = i;
+				coluna = j;
+				matrizAlternativa = copiarMatriz(matriz);
+				if (matrizAlternativa[linha][coluna] == 0){
+					matrizAlternativa[linha][coluna] = playerIdx;
+					if (verificarVencedor(matrizAlternativa)){
+						var elemento = $("[data-linha='" + linha + "'][data-coluna='" + coluna + "']");
+						joga(linha, coluna, elemento);
+						return;
+					}
+				}
+			}
+		}
+
+		//Defender
+		var playerIdxOutro;
+		if(playerIdx == 1){
+			playerIdxOutro = 2;
+		}
+		else{
+			playerIdxOutro = 1;
+		}
+
+		for(var i=0; i!=3; i++){
+			for(var j=0; j!=3; j++){
+				linha = i;
+				coluna = j;
+				matrizAlternativa = copiarMatriz(matriz);
+				if (matrizAlternativa[linha][coluna] == 0){
+					matrizAlternativa[linha][coluna] = playerIdxOutro;
+					if (verificarVencedor(matrizAlternativa)){
+						var elemento = $("[data-linha='" + linha + "'][data-coluna='" + coluna + "']");
+						joga(linha, coluna, elemento);
+						return;
+					}
+				}
+			}
+		}
+
+		//solução de recurso (aleatório)
+		var encontrado = false;
+		while(!encontrado){
+			linha = Math.floor((Math.random() * 3) + 0);
+			coluna = Math.floor((Math.random() * 3) + 0);
+			if (matrizAlternativa[linha][coluna] == 0){
+				var elemento = $("[data-linha='" + linha + "'][data-coluna='" + coluna + "']");
+				joga(linha, coluna, elemento);
+				encontrado = true;
+			}
+		}
+	}
+
+	$(document).ready(function(){
+		preparePolifills();
+
+		$("td").click(function(){
+			
+			if (terminado == true){
+				return;
+			}
+			var linha = $(this).data("linha");
+			var coluna = $(this).data("coluna");
+			//alert("Clicked: linha: " + linha + "; coluna: " + coluna);
+
+			joga(linha, coluna, this);
+		});
+
+		$("#playCPU").click(function(){
+			jogaCPU();
+			
+		});
+	});
+</script>
+
+<body>
+	<h1>Jogo do Galo</h1>
+	<table>
+		<tbody>
+			<tr>
+				<td data-linha="0" data-coluna="0"><img src="img/empty.png"/></td>
+				<td data-linha="0" data-coluna="1"><img src="img/empty.png"/></td>
+				<td data-linha="0" data-coluna="2"><img src="img/empty.png"/></td>
+			</tr>
+			<tr>
+				<td data-linha="1" data-coluna="0"><img src="img/empty.png"/></td>
+				<td data-linha="1" data-coluna="1"><img src="img/empty.png"/></td>
+				<td data-linha="1" data-coluna="2"><img src="img/empty.png"/></td>
+			</tr>
+			<tr>
+				<td data-linha="2" data-coluna="0"><img src="img/empty.png"/></td>
+				<td data-linha="2" data-coluna="1"><img src="img/empty.png"/></td>
+				<td data-linha="2" data-coluna="2"><img src="img/empty.png"/></td>
+			</tr>
+		</tbody>
+	</table>
+	<input id="playCPU" type="button" value="Joga CPU"/>
+	<input id="newGame" type="button" value="Novo Jogo"/>
+</body>
+
+</html>
