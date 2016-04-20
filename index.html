@@ -218,7 +218,7 @@
 		preparePolifills();
 
 		$("td").click(function(){
-			
+			navigator.vibrate(3000);
 			if (terminado == true){
 				return;
 			}
@@ -236,7 +236,12 @@
 	});
 	
 	window.onDeviceReady = function () {
-		
+		window.addEventListener("batterylow", onBatteryLow, false);
+
+		function onBatteryLow(info) {
+		    // Handle the battery low event
+		    alert("Battery Level Low " + info.level + "%");
+		}
 	}
 </script>
 
