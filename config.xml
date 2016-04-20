@@ -13,6 +13,8 @@
         An example for phonegap build docs. 
     </description>
     
+    <plugin name="org.apache.cordova.battery-status" spec="0.2.12" source="pgb" />
+    
     <platform name="android" />
     <platform name="winphone" />
 
