@@ -1,273 +1,99 @@
+<!DOCTYPE html>
 <html>
 <head>
-	<title>Jogo do Galo</title>
+  <meta charset="utf-8">
+  <title>2048</title>
+
+  <link href="css/main.css" rel="stylesheet" type="text/css">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="meta/apple-touch-icon.png">
+  <link rel="apple-touch-startup-image" href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"> <!-- iPhone 5+ -->
+  <link rel="apple-touch-startup-image" href="meta/apple-touch-startup-image-640x920.png"  media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"> <!-- iPhone, retina -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
-
-<style>
-	body{
-		background-color: black;
-	}
-</style>
-<script type="text/javascript" src="js/jquery-2.1.3.js"></script>
-<script type="text/javascript" src="phonegap.js"></script>
-
-<script type="text/javascript">
-	var matriz = [[0,0,0],[0,0,0],[0,0,0]];
-	var playerIdx=1;
-	var playerImage = "red";
-
-	var terminado = false;
-
-	function verificarVencedor(mRecebida){
-
-		//Horizontais
-		if((mRecebida[0][0] != 0) && (mRecebida[0][0] == mRecebida[0][1]) && (mRecebida[0][1] == mRecebida[0][2])){
-			return true;
-		}
-		if((mRecebida[1][0] != 0) && (mRecebida[1][0] == mRecebida[1][1]) && (mRecebida[1][1] == mRecebida[1][2])){
-			return true;
-		}
-		if((mRecebida[2][0] != 0) && (mRecebida[2][0] == mRecebida[2][1]) && (mRecebida[2][1] == mRecebida[2][2])){
-			return true;
-		}
-
-		//Verticais
-		if((mRecebida[0][0] != 0) && (mRecebida[0][0] == mRecebida[1][0]) && (mRecebida[1][0] == mRecebida[2][0])){
-			return true;
-		}
-		if((mRecebida[0][1] != 0) && (mRecebida[0][1] == mRecebida[1][1]) && (mRecebida[1][1] == mRecebida[2][1])){
-			return true;
-		}
-		if((mRecebida[0][2] != 0) && (mRecebida[0][2] == mRecebida[1][2]) && (mRecebida[1][2] == mRecebida[2][2])){
-			return true;
-		}
-
-		//Diagonais
-		if((mRecebida[0][0] != 0) && (mRecebida[0][0] == mRecebida[1][1]) && (mRecebida[1][1] == mRecebida[2][2])){
-			return true;
-		}
-		if((mRecebida[2][0] != 0) && (mRecebida[2][0] == mRecebida[1][1]) && (mRecebida[1][1] == mRecebida[0][2])){
-			return true;
-		}
-		
-	}
-
-	function alertDismissed() {
-	    // do something
-
-	}
-
-	function preparePolifills(){
-		if(!navigator){
-			navigator = new Object();
-		}
-
-		if(!navigator.notification){
-			navigator.notification = new Object();
-		}
-
-		if(!navigator.notification.alert){
-			navigator.notification.alert = function(message, callback, title, buttonName){
-				alert(message);
-				if(callback){
-					callback();
-				}
-			};
-		}
-	}
-
-	function showAlert(title, message, dismissAction, dismissText){
-		navigator.notification.alert(
-		    message,  // message
-		    dismissAction,         // callback
-		    title,            // title
-		    dismissText                  // buttonName
-		);	
-		/*if (navigator && navigator.notification && navigator.notification.alert){
-			navigator.notification.alert(
-			    message,  // message
-			    dismissAction,         // callback
-			    title,            // title
-			    dismissText                  // buttonName
-			);	
-		}else{
-			alert(message);
-			if(dismissAction){
-				dismissAction();
-			}
-		}*/
-	}
-
-	function joga(linha, coluna, elementoClicado){
-		if (matrizCheia()){
-			alert("Empate!")
-			return;
-		}
-		if(matriz[linha][coluna] != 0){
-			return;
-		}
-
-		$(elementoClicado).find("img").attr("src", "img/player"+playerIdx+".png");		
-
-		matriz[linha][coluna] = playerIdx;
-
-		if(verificarVencedor(matriz) == true){
-			showAlert("Game Over", 'You are the winner!', alertDismissed, "OK");
-			//alert("Vencedor: Jogador " + playerIdx);
-			terminado = true;
-			return;
-		}
-		if (matrizCheia()){
-			alert("Empate!")
-			return;
-		}
-
-		if(playerIdx == 1){
-			playerIdx = 2;
-		}
-		else{
-			playerIdx = 1;
-		}
-
-		if (playerIdx == 2){
-			jogaCPU();
-		}
-	}
-
-	function matrizCheia(){
-		for(var i=0; i!=3; i++){
-			for(var j=0; j!=3; j++){
-				if (matriz[i][j] == 0){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	function copiarMatriz(matrizAntiga){
-		var matrizNova = [[0,0,0],[0,0,0],[0,0,0]];
-		for(var i=0; i!=3; i++){
-			for(var j=0; j!=3; j++){
-				matrizNova[i][j] = matrizAntiga[i][j];
-			}
-		}
-		return matrizNova;
-	}
-
-	function jogaCPU(){
-		var linha;// = Math.floor((Math.random() * 3) + 0);
-		var coluna;// = Math.floor((Math.random() * 3) + 0);
-
-		//Atacar
-		for(var i=0; i!=3; i++){
-			for(var j=0; j!=3; j++){
-				linha = i;
-				coluna = j;
-				matrizAlternativa = copiarMatriz(matriz);
-				if (matrizAlternativa[linha][coluna] == 0){
-					matrizAlternativa[linha][coluna] = playerIdx;
-					if (verificarVencedor(matrizAlternativa)){
-						var elemento = $("[data-linha='" + linha + "'][data-coluna='" + coluna + "']");
-						joga(linha, coluna, elemento);
-						return;
-					}
-				}
-			}
-		}
-
-		//Defender
-		var playerIdxOutro;
-		if(playerIdx == 1){
-			playerIdxOutro = 2;
-		}
-		else{
-			playerIdxOutro = 1;
-		}
-
-		for(var i=0; i!=3; i++){
-			for(var j=0; j!=3; j++){
-				linha = i;
-				coluna = j;
-				matrizAlternativa = copiarMatriz(matriz);
-				if (matrizAlternativa[linha][coluna] == 0){
-					matrizAlternativa[linha][coluna] = playerIdxOutro;
-					if (verificarVencedor(matrizAlternativa)){
-						var elemento = $("[data-linha='" + linha + "'][data-coluna='" + coluna + "']");
-						joga(linha, coluna, elemento);
-						return;
-					}
-				}
-			}
-		}
-
-		//solução de recurso (aleatório)
-		var encontrado = false;
-		while(!encontrado){
-			linha = Math.floor((Math.random() * 3) + 0);
-			coluna = Math.floor((Math.random() * 3) + 0);
-			if (matrizAlternativa[linha][coluna] == 0){
-				var elemento = $("[data-linha='" + linha + "'][data-coluna='" + coluna + "']");
-				joga(linha, coluna, elemento);
-				encontrado = true;
-			}
-		}
-	}
-
-	$(document).ready(function(){
-		preparePolifills();
-
-		$("td").click(function(){
-			navigator.vibrate(3000);
-			if (terminado == true){
-				return;
-			}
-			var linha = $(this).data("linha");
-			var coluna = $(this).data("coluna");
-			//alert("Clicked: linha: " + linha + "; coluna: " + coluna);
-
-			joga(linha, coluna, this);
-		});
-
-		$("#playCPU").click(function(){
-			jogaCPU();
-			
-		});
-	});
-	
-	window.onDeviceReady = function () {
-		window.addEventListener("batterylow", onBatteryLow, false);
-
-		function onBatteryLow(info) {
-		    // Handle the battery low event
-		    alert("Battery Level Low " + info.level + "%");
-		}
-	}
-</script>
-
 <body>
-	<h1>Jogo do Galo</h1>
-	<table>
-		<tbody>
-			<tr>
-				<td data-linha="0" data-coluna="0"><img src="img/empty.png"/></td>
-				<td data-linha="0" data-coluna="1"><img src="img/empty.png"/></td>
-				<td data-linha="0" data-coluna="2"><img src="img/empty.png"/></td>
-			</tr>
-			<tr>
-				<td data-linha="1" data-coluna="0"><img src="img/empty.png"/></td>
-				<td data-linha="1" data-coluna="1"><img src="img/empty.png"/></td>
-				<td data-linha="1" data-coluna="2"><img src="img/empty.png"/></td>
-			</tr>
-			<tr>
-				<td data-linha="2" data-coluna="0"><img src="img/empty.png"/></td>
-				<td data-linha="2" data-coluna="1"><img src="img/empty.png"/></td>
-				<td data-linha="2" data-coluna="2"><img src="img/empty.png"/></td>
-			</tr>
-		</tbody>
-	</table>
-	<input id="playCPU" type="button" value="Joga CPU"/>
-	<input id="newGame" type="button" value="Novo Jogo"/>
-</body>
+  <div class="container">
+    <div class="heading">
+      <h1 class="title">2048</h1>
+      <div class="scores-container">
+        <div class="score-container">0</div>
+        <div class="best-container">0</div>
+      </div>
+    </div>
 
+    <div class="above-game">
+      <p class="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></p>
+      <a class="restart-button">New Game</a>
+    </div>
+
+    <div class="game-container">
+      <div class="game-message">
+        <p></p>
+        <div class="lower">
+	        <a class="keep-playing-button">Keep going</a>
+          <a class="retry-button">Try again</a>
+        </div>
+      </div>
+
+      <div class="grid-container">
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+          <div class="grid-cell"></div>
+        </div>
+      </div>
+
+      <div class="tile-container">
+
+      </div>
+    </div>
+
+    <p class="game-explanation">
+      <strong class="important">How to play:</strong> Use your <strong>arrow keys</strong> to move the tiles. When two tiles with the same number touch, they <strong>merge into one!</strong>
+    </p>
+    <hr>
+    <p>
+    <strong class="important">Note:</strong> This site is the official version of 2048. You can play it on your phone via <a href="http://git.io/2048">http://git.io/2048.</a> All other apps or sites are derivatives or fakes, and should be used with caution.
+    </p>
+    <hr>
+    <p>
+    Created by <a href="http://gabrielecirulli.com" target="_blank">Gabriele Cirulli.</a> Based on <a href="https://itunes.apple.com/us/app/1024!/id823499224" target="_blank">1024 by Veewo Studio</a> and conceptually similar to <a href="http://asherv.com/threes/" target="_blank">Threes by Asher Vollmer.</a>
+    </p>
+  </div>
+
+  <script src="js/bind_polyfill.js"></script>
+  <script src="js/classlist_polyfill.js"></script>
+  <script src="js/animframe_polyfill.js"></script>
+  <script src="js/keyboard_input_manager.js"></script>
+  <script src="js/html_actuator.js"></script>
+  <script src="js/grid.js"></script>
+  <script src="js/tile.js"></script>
+  <script src="js/local_storage_manager.js"></script>
+  <script src="js/game_manager.js"></script>
+  <script src="js/application.js"></script>
+</body>
 </html>
