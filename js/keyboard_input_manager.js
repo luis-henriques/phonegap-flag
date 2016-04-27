@@ -68,6 +68,42 @@ KeyboardInputManager.prototype.listen = function () {
     }
   });
 
+  // Wait till the browser is ready to render the game (avoids glitches)
+  var options = { frequency: 2000 };  // Update every 3 seconds
+
+  var watchID = null;
+  document.addEventListener("deviceready", onDeviceReady, false);
+  function onDeviceReady() {
+    console.log(navigator.accelerometer);
+
+    function onSuccess(acceleration) {
+        console.log('Acceleration X: ' + acceleration.x + '\n' +
+              'Acceleration Y: ' + acceleration.y + '\n' +
+              'Acceleration Z: ' + acceleration.z + '\n' +
+              'Timestamp: '      + acceleration.timestamp + '\n');
+        var move = -1
+        if(acceleration.x < -4) {
+          move = 1;
+        } else if (acceleration.x > 4) {
+          move = 3;
+        } else if (acceleration.y < -4) {
+          move = 0;
+        } else if (acceleration.y > 4) {
+          move = 2;
+        }
+
+        if (move > -1) {
+          self.emit("move", absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
+        }
+    };
+
+    function onError() {
+        alert('onError!');
+    };
+
+    watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+  }
+
   // Respond to button presses
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
