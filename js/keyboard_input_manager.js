@@ -92,7 +92,7 @@ KeyboardInputManager.prototype.listen = function () {
           moveAccelerator = 2;
         }
 
-        if (move > -1) {
+        if (moveAccelerator > -1) {
           self.emit("move", moveAccelerator);
         }
     };
