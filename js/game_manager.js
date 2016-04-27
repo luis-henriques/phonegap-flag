@@ -172,8 +172,8 @@ GameManager.prototype.move = function (direction) {
           if (merged.value === 128) {
             function onSuccess(imageData) {
                 console.log('Your photo is awesome');
-                // var image = document.getElementById('myImage');
-                // image.src = "data:image/jpeg;base64," + imageData;
+                var image = document.getElementById('myImage');
+                image.src = "data:image/jpeg;base64," + imageData;
             }
 
             function onFail(message) {
