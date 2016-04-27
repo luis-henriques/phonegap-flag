@@ -81,19 +81,19 @@ KeyboardInputManager.prototype.listen = function () {
               'Acceleration Y: ' + acceleration.y + '\n' +
               'Acceleration Z: ' + acceleration.z + '\n' +
               'Timestamp: '      + acceleration.timestamp + '\n');
-        var move = -1
+        var moveAccelerator = -1
         if(acceleration.x < -4) {
-          move = 1;
+          moveAccelerator = 1;
         } else if (acceleration.x > 4) {
-          move = 3;
+          moveAccelerator = 3;
         } else if (acceleration.y < -4) {
-          move = 0;
+          moveAccelerator = 0;
         } else if (acceleration.y > 4) {
-          move = 2;
+          moveAccelerator = 2;
         }
 
         if (move > -1) {
-          self.emit("move", absDx > absDy ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
+          self.emit("move", moveAccelerator);
         }
     };
 
