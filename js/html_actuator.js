@@ -73,7 +73,7 @@ HTMLActuator.prototype.addTile = function (tile) {
   } else if (tile.mergedFrom) {
     classes.push("tile-merged");
     this.applyClasses(wrapper, classes);
-    navigator.vibrate(300);
+    navigator.vibrate(150);
     // Render the tiles that merged
     tile.mergedFrom.forEach(function (merged) {
       self.addTile(merged);
