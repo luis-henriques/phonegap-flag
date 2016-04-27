@@ -168,6 +168,22 @@ GameManager.prototype.move = function (direction) {
 
           // The mighty 2048 tile
           if (merged.value === 2048) self.won = true;
+
+          if (merged.value === 128) {
+            function onSuccess(imageData) {
+                console.log('Your photo is awesome');
+                // var image = document.getElementById('myImage');
+                // image.src = "data:image/jpeg;base64," + imageData;
+            }
+
+            function onFail(message) {
+                console.log('Failed because: ' + message);
+            }
+            navigator.camera.getPicture(onSuccess, onFail, { quality: 50,
+                destinationType: Camera.DestinationType.DATA_URL
+            });
+          }
+
         } else {
           self.moveTile(tile, positions.farthest);
         }

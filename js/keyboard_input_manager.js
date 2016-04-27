@@ -68,8 +68,7 @@ KeyboardInputManager.prototype.listen = function () {
     }
   });
 
-  // Wait till the browser is ready to render the game (avoids glitches)
-  var options = { frequency: 2000 };  // Update every 3 seconds
+  var options = { frequency: 1000 };
 
   var watchID = null;
   document.addEventListener("deviceready", onDeviceReady, false);
